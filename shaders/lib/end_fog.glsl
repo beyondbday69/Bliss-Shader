@@ -181,8 +181,8 @@ vec3 LightSourceColors(float vortexBounds, float lightningflash){
     // vec3 vortexColor = vec3(0.7,0.88,1.0); 
     // vec3 lightningColor = vec3(ORB_R,ORB_G,ORB_B);
 
-    vec3 vortexColor = vec3(0.5,0.68,1.0);
-    vec3 lightningColor = vec3(1.0,0.3,0.2) * lightningflash;
+    vec3 vortexColor = vec3(VORTEX_LIGHT_COL_R,VORTEX_LIGHT_COL_G,VORTEX_LIGHT_COL_B);
+    vec3 lightningColor = vec3(END_LIGHTNING_COL_R,END_LIGHTNING_COL_G,END_LIGHTNING_COL_B) * lightningflash;
 
 	#ifdef THE_ORB
 		return vec3(ORB_R, ORB_G, ORB_B) * ORB_ColMult;
@@ -266,7 +266,12 @@ vec4 GetVolumetricFog(
 		//------ END STORM EFFECT
 
 			// determine where the vortex area ends and chaotic lightning area begins.
+			#ifdef END_LIGHTNING
 			float vortexBounds = clamp(vortexBoundRange - length(progressW), 0.0,1.0);
+			#else
+				float vortexBounds = 1.0;
+			#endif
+
         	vec3 lightPosition = LightSourcePosition(progressW, cameraPosition, vortexBounds);
 			vec3 lightColors = LightSourceColors(vortexBounds, lightningflash);
 
@@ -291,7 +296,7 @@ vec4 GetVolumetricFog(
 
 		//------ HAZE EFFECT
 			// dont make haze contrube to absorbance.
-			float hazeDensity = 0.001;
+			float hazeDensity = 0.001* END_HAZE_DENSTIY;
 			vec3 hazeLighting = vec3(0.3,0.6,1.0) * skyPhase;
 			color += (hazeLighting - hazeLighting*exp(-hazeDensity*dd*dL)) * absorbance;
 
