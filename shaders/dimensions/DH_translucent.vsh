@@ -48,46 +48,34 @@ uniform float far;
 
 
 
+
 uniform vec3 cameraPosition;
 #define diagonal3(m) vec3((m)[0].x, (m)[1].y, m[2].z)
 #define  projMAD(m, v) (diagonal3(m) * (v) + (m)[3].xyz)
-vec4 toClipSpace3(vec3 viewSpacePosition) {
-    return vec4(projMAD(dhProjection, viewSpacePosition),-viewSpacePosition.z);
+
+vec4 toClipSpace3_THING(vec3 viewSpacePosition) {
+    return vec4(projMAD(gl_ProjectionMatrix, viewSpacePosition),-viewSpacePosition.z);
 }
                      
 void main() {
-    gl_Position = ftransform();
-    
-	vec3 position = mat3(gl_ModelViewMatrix) * vec3(gl_Vertex) + gl_ModelViewMatrix[3].xyz;
-	
+
+    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;	
 	pos = gl_ModelViewMatrix * gl_Vertex;
-	
 
     isWater = 0;
 	if (dhMaterialId == DH_BLOCK_WATER){
 	    isWater = 1;
-		
-		// offset water to not look like a full cube
-    	vec3 worldpos = mat3(gbufferModelViewInverse) * position + gbufferModelViewInverse[3].xyz ;
-		worldpos.y -= 1.8/16.0;
-    	position = mat3(gbufferModelView) * worldpos + gbufferModelView[3].xyz;
-
 	}
 
-	gl_Position = toClipSpace3(position);
-
 	normals_and_materials = vec4(normalize(gl_Normal), 1.0);
-
     gcolor = gl_Color;
 	lightmapCoords = gl_MultiTexCoord1.xy;
-
-
-
 
 	lightCol.rgb = texelFetch2D(colortex4,ivec2(6,37),0).rgb;
 	lightCol.a = float(sunElevation > 1e-5)*2.0 - 1.0;
 
 	averageSkyCol_Clouds = texelFetch2D(colortex4,ivec2(0,37),0).rgb;
+
 	#ifdef OVERWORLD_SHADER
 		#if defined Daily_Weather
 			dailyWeatherParams0 = vec4((texelFetch2D(colortex4,ivec2(1,1),0).rgb/150.0)/2.0, 0.0);
@@ -95,15 +83,9 @@ void main() {
 		#endif
 	#endif
 
-
 	WsunVec = lightCol.a * normalize(mat3(gbufferModelViewInverse) * sunPosition);
 	WsunVec2 = lightCol.a * normalize(sunPosition);
 	
-
-
-
-
-
 	#ifdef TAA_UPSCALING
 		gl_Position.xy = gl_Position.xy * RENDER_SCALE + RENDER_SCALE * gl_Position.w - gl_Position.w;
 	#endif
