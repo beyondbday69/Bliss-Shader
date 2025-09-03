@@ -404,7 +404,7 @@ void main() {
 	#if defined OVERWORLD_SHADER && defined CLOUDS_INTERSECT_TERRAIN
 		vec4 VolumetricClouds = renderClouds(viewPos0, vec2(noise_1,noise_2), directLightColor, indirectLightColor, cloudDepth);
 		
-		#ifdef CAVE_FOG
+		#if defined CAVE_FOG && defined CAVE_FOG_DARKEN_SKY 
   	  		float skyhole = (1.0-pow(clamp(1.0-pow(max(playerPos_normalized.y - 0.6,0.0)*5.0,2.0),0.0,1.0),2)* caveDetection) ;
 			VolumetricClouds.rgb *= skyhole;
 			VolumetricClouds.a = mix(VolumetricClouds.a, 1.0,   (1.0-skyhole) * caveDetection);
