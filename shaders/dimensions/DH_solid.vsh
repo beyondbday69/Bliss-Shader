@@ -2,6 +2,7 @@
 #include "/lib/res_params.glsl"
 
 varying vec4 pos;
+varying vec4 localPos;
 varying vec4 gcolor;
 varying vec2 lightmapCoords;
 varying vec4 normals_and_materials;
@@ -25,7 +26,7 @@ uniform float far;
 
 
 
-/*
+
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferModelView;
 uniform float far;
@@ -37,26 +38,22 @@ uniform vec3 cameraPosition;
 vec4 toClipSpace3(vec3 viewSpacePosition) {
     return vec4(projMAD(dhProjection, viewSpacePosition),-viewSpacePosition.z);
 }
-*/  
+
 
 #define SEASONS_VSH
 #define DH_SEASONS
 #include "/lib/climate_settings.glsl"
 
 void main() {
-    gl_Position = ftransform();
+    vec4 vPos = gl_Vertex;
 
-	/*
-		vec3 position = mat3(gl_ModelViewMatrix) * vec3(gl_Vertex) + gl_ModelViewMatrix[3].xyz;
-	    vec3 worldpos = mat3(gbufferModelViewInverse) * position + gbufferModelViewInverse[3].xyz;
+    vec3 cameraOffset = fract(cameraPosition);
+    vPos.xyz = floor(vPos.xyz + cameraOffset + 0.5) - cameraOffset;
 
-		float cellSize = 32*2;
-		vec3 modulusWorldPos = vec3(worldpos.x,worldpos.y,worldpos.z) + fract(cameraPosition/cellSize)*cellSize - cellSize*0.5;
+    vec4 viewPos = gl_ModelViewMatrix * vPos;
+	localPos = gbufferModelViewInverse * viewPos;
 
-		worldpos.y -= (clamp(1.0-length(modulusWorldPos)/max(far-32,0.0),0.0,1.0)) * 50.0;
-	    position = mat3(gbufferModelView) * worldpos + gbufferModelView[3].xyz;
-		gl_Position = toClipSpace3(position);
-	*/
+    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;	
 
 	#ifdef TAA_UPSCALING
 		gl_Position.xy = gl_Position.xy * RENDER_SCALE + RENDER_SCALE * gl_Position.w - gl_Position.w;
