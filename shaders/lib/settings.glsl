@@ -1,4 +1,4 @@
-#define SHADER_VERSION_LABEL 482 // [482]
+#define SHADER_VERSION_LABEL
 
 #define saturate(x) clamp(x,0.0,1.0)
 
@@ -801,7 +801,7 @@ const vec3 aerochrome_color = mix(vec3(1.0, 0.0, 0.0), vec3(0.715, 0.303, 0.631)
 #endif
 #ifdef LIGHTNING_FLASH
 #endif
-#if SHADER_VERSION_LABEL > 0
+#ifdef SHADER_VERSION_LABEL
 #endif
 #if DH_KNOWN_ISSUES == 0
 #endif
