@@ -29,6 +29,7 @@ const bool colortex5MipmapEnabled = true;
 	#endif
 
 	flat varying vec3 averageSkyCol_Clouds;
+	flat varying vec3 averageSkyCol;
 	flat varying vec4 lightCol;
 
 	#if Sun_specular_Strength != 0
@@ -1300,6 +1301,26 @@ void main() {
 
 		gl_FragData[0].rgb *= Absorbtion;
 	}
+
+  	#if defined BorderFog && defined OVERWORLD_SHADER
+  	  #ifdef DISTANT_HORIZONS
+  	  	float fog = smoothstep(1.0, 0.0, min(max(1.0 - length(feetPlayerPos) / dhRenderDistance,0.0)*3.0,1.0)   );
+  	  #else
+  	  	float fog = smoothstep(1.0, 0.0, min(max(1.0 - length(feetPlayerPos) / far,0.0)*3.0,1.0)   );
+  	  #endif
+
+  	  fog *= exp(-10.0 * pow(clamp(feetPlayerPos_normalized.y,0.0,1.0)*4.0,2.0));
+
+  	  if(swappedDepth >= 1.0 || isEyeInWater != 0) fog = 0.0;
+
+  	  #ifdef SKY_GROUND
+  	    vec3 borderFogColor = averageSkyCol;
+  	  #else
+  	    vec3 borderFogColor = skyFromTex(feetPlayerPos_normalized, colortex4)/30.0;
+  	  #endif
+
+  	  gl_FragData[0].rgb = mix(gl_FragData[0].rgb, borderFogColor, fog);
+  	#endif
 
 	if(translucentMasks > 0.0){
 		#ifdef DISTANT_HORIZONS

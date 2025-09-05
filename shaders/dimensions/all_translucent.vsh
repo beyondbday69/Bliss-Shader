@@ -22,6 +22,7 @@ flat varying float exposure;
 
 #ifdef OVERWORLD_SHADER
 	flat varying vec3 averageSkyCol_Clouds;
+	flat varying vec3 averageSkyCol;
 	flat varying vec4 lightCol;
 	flat varying vec3 WsunVec;
 
@@ -188,6 +189,7 @@ void main() {
 		lightCol.a = float(sunElevation > 1e-5)*2.0 - 1.0;
 	
 		averageSkyCol_Clouds = texelFetch2D(colortex4,ivec2(0,37),0).rgb;
+		averageSkyCol = texelFetch2D(colortex4,ivec2(1,37),0).rgb / 30.0 * Sky_Brightness;
 	
 		WsunVec = lightCol.a * normalize(mat3(gbufferModelViewInverse) * sunPosition);
 		// WsunVec = normalize(LightDir);

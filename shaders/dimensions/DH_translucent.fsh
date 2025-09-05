@@ -60,6 +60,8 @@ uniform int frameCounter;
 
 // uniform sampler2D colortex4;
 flat varying vec3 averageSkyCol_Clouds;
+flat varying vec3 averageSkyCol;
+
 flat varying vec4 lightCol;
 flat varying vec3 WsunVec;
 flat varying vec3 WsunVec2;
@@ -397,6 +399,23 @@ if (gl_FragCoord.x * texelSize.x < 1.0  && gl_FragCoord.y * texelSize.y < 1.0 )	
 
 	vec3 FinalColor = (Indirect_lighting + Direct_lighting) * Albedo;
 
+	#if defined BorderFog && defined OVERWORLD_SHADER
+	
+	  #ifdef DISTANT_HORIZONS
+	  	float fog = smoothstep(1.0, 0.0, min(max(1.0 - length(playerPos) / dhRenderDistance,0.0)*3.0,1.0)   );
+	  #else
+	  	float fog = smoothstep(1.0, 0.0, min(max(1.0 - length(playerPos) / far,0.0)*3.0,1.0)   );
+	  #endif
+
+	  fog *= exp(-10.0 * pow(clamp(normalize(playerPos).y,0.0,1.0)*4.0,2.0));
+
+	  #ifdef SKY_GROUND
+	    vec3 borderFogColor = averageSkyCol;
+	  #else
+	    vec3 borderFogColor = skyFromTex(normalize(playerPos), colortex4)/30.0;
+	  #endif
+	#endif
+
     // specular
     #ifdef WATER_REFLECTIONS
 		vec3 Reflections_Final = vec3(0.0);
@@ -443,6 +462,11 @@ if (gl_FragCoord.x * texelSize.x < 1.0  && gl_FragCoord.y * texelSize.y < 1.0 )	
 
 		//correct alpha channel with fresnel
 		float alpha0 = gl_FragData[0].a;
+		
+		#if defined BorderFog && defined OVERWORLD_SHADER
+			fresnel = mix(fresnel, 1.0, fog);
+			alpha0 = mix(alpha0, 1.0 , fog);
+		#endif
 
 		gl_FragData[0].a = -gl_FragData[0].a * fresnel + gl_FragData[0].a + fresnel;
 
@@ -453,7 +477,11 @@ if (gl_FragCoord.x * texelSize.x < 1.0  && gl_FragCoord.y * texelSize.y < 1.0 )	
 	#else
 		gl_FragData[0].rgb = FinalColor*0.1;
 	#endif
-    
+	
+	#if defined BorderFog && defined OVERWORLD_SHADER
+		gl_FragData[0].rgb  = mix(gl_FragData[0].rgb, borderFogColor*0.1, fog);
+	#endif
+
     #ifdef DH_OVERDRAW_PREVENTION
         float distancefade = min(max(1.0 - length(playerPos)/clamp(far-16*4, 16, maxOverdrawDistance),0.0)*5,1.0);
 

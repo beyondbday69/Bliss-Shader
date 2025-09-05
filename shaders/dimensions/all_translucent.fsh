@@ -29,6 +29,7 @@ uniform vec4 entityColor;
 	flat varying vec3 WsunVec;
 
 	flat varying vec3 averageSkyCol_Clouds;
+	flat varying vec3 averageSkyCol;
 	flat varying vec4 lightCol;
 #endif
 
@@ -684,6 +685,23 @@ if (gl_FragCoord.x * texelSize.x < 1.0  && gl_FragCoord.y * texelSize.y < 1.0 )	
 	
 	vec3 FinalColor = (Indirect_lighting + Direct_lighting) * Albedo;
 
+	#if defined BorderFog && defined OVERWORLD_SHADER
+	
+	  #ifdef DISTANT_HORIZONS
+	  	float fog = smoothstep(1.0, 0.0, min(max(1.0 - length(feetPlayerPos) / dhRenderDistance,0.0)*3.0,1.0)   );
+	  #else
+	  	float fog = smoothstep(1.0, 0.0, min(max(1.0 - length(feetPlayerPos) / far,0.0)*3.0,1.0)   );
+	  #endif
+
+	  fog *= exp(-10.0 * pow(clamp(normalize(feetPlayerPos).y,0.0,1.0)*4.0,2.0));
+
+	  #ifdef SKY_GROUND
+	    vec3 borderFogColor = averageSkyCol;
+	  #else
+	    vec3 borderFogColor = skyFromTex(normalize(feetPlayerPos), colortex4)/30.0;
+	  #endif
+	#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// SPECULAR LIGHTING /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -793,13 +811,22 @@ if (gl_FragCoord.x * texelSize.x < 1.0  && gl_FragCoord.y * texelSize.y < 1.0 )	
 			Reflections_Final = mix(mix(FinalColor, BackgroundReflection, indoors), Reflections.rgb, Reflections.a) * fresnel * visibilityFactor;
 			Reflections_Final += SunReflection;
 
+
 			//correct alpha channel with fresnel
 			float alpha0 = gl_FragData[0].a;
 
+			#if defined BorderFog && defined OVERWORLD_SHADER
+				fresnel = mix(fresnel, 1.0, fog);
+				alpha0 = mix(alpha0, 1.0 , fog);
+			#endif
 			gl_FragData[0].a = -gl_FragData[0].a * fresnel + gl_FragData[0].a + fresnel;
 
 			// prevent reflections from being darkened by buffer blending
 			gl_FragData[0].rgb = clamp(FinalColor / gl_FragData[0].a*alpha0*(1.0-fresnel) * 0.1		+	Reflections_Final / gl_FragData[0].a * 0.1,0.0,65100.0);
+
+			#if defined BorderFog && defined OVERWORLD_SHADER
+				gl_FragData[0].rgb  = mix(gl_FragData[0].rgb, borderFogColor*0.1, fog);
+			#endif
 
 			if (gl_FragData[0].r > 65000.) gl_FragData[0].rgba = vec4(0.0);
 

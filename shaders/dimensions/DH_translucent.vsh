@@ -11,6 +11,7 @@ flat varying int isWater;
 
 uniform sampler2D colortex4;
 flat varying vec3 averageSkyCol_Clouds;
+flat varying vec3 averageSkyCol;
 flat varying vec4 lightCol;
 
 #ifdef OVERWORLD_SHADER
@@ -75,6 +76,7 @@ void main() {
 	lightCol.a = float(sunElevation > 1e-5)*2.0 - 1.0;
 
 	averageSkyCol_Clouds = texelFetch2D(colortex4,ivec2(0,37),0).rgb;
+	averageSkyCol = texelFetch2D(colortex4,ivec2(1,37),0).rgb / 30.0 * Sky_Brightness;
 
 	#ifdef OVERWORLD_SHADER
 		#if defined Daily_Weather
