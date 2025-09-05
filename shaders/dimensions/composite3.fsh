@@ -280,8 +280,8 @@ void main() {
 	// bool isOpaque_entity = abs(opaqueMasks-0.45) < 0.01;
 
 	////// --------------- UNPACK TRANSLUCENT GBUFFERS --------------- //////
-	vec4 data = texture2D(colortex11,texcoord).rgba;
-	vec4 unpack0 = vec4(decodeVec2(data.r),decodeVec2(data.g)) ;
+	vec4 data = texelFetch2D(colortex11,ivec2(gl_FragCoord.xy),0);
+	vec4 unpack0 = vec4(decodeVec2(data.r),decodeVec2(data.g));
 	vec4 unpack1 = vec4(decodeVec2(data.b),0,0) ;
 	
 	vec4 albedo = vec4(unpack0.ba,unpack1.rg);
