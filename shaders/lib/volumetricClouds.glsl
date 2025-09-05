@@ -38,7 +38,7 @@ float LAYER2_HEIGHT = max(CloudLayer2_height, LAYER1_maxHEIGHT);
 // float LAYER1_COVERAGE = mix(pow(dailyWeatherParams0.y*2.0,0.2), 0.8, rainStrength);
 // float LAYER2_COVERAGE = mix(pow(dailyWeatherParams0.z*2.0,0.2), 1.3, rainStrength);
 
-float LAYER0_COVERAGE = mix(dailyWeatherParams0.x, 0.95, rainStrength);
+float LAYER0_COVERAGE = mix(dailyWeatherParams0.x, Rain_coverage, rainStrength);
 float LAYER1_COVERAGE = mix(dailyWeatherParams0.y, 0.0, rainStrength);
 float LAYER2_COVERAGE = mix(dailyWeatherParams0.z, 1.5, rainStrength);
 
