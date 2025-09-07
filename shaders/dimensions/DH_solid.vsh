@@ -18,7 +18,7 @@ uniform int hideGUI;
 uniform int frameCounter;
 uniform float aspectRatio;
 uniform float screenBrightness;
-uniform float far;
+// uniform float far;
 #include "/lib/bokeh.glsl"
 #endif
 
