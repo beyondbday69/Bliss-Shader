@@ -2,7 +2,7 @@
 name: Bug Report
 about: Create a bug report so i can see if i can fix it.
 title: write the topic of your issue. DO NOT WRITE THE ENTIRE ISSUE IN THIS TITLE
-labels: bug, question
+labels: bug
 assignees: ''
 
 ---
