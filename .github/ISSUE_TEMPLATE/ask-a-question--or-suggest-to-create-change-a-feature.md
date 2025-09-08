@@ -7,11 +7,12 @@ assignees: ''
 
 ---
 
+[//]: # (
+\
 PLEASE READ THIS BEFORE WRITING YOUR SUBJECT!!!!
-
 i have a discord server that is meant exactly for this! please join!
 copy this discord invite link: https://discord.gg/8nVt56H9zH
+\
+If you do not have discord or just do not want to join, that is fine. write your question/suggestion with this instead )
 
-If you do not have discord or just do not want to join, that is fine. write your question/suggestion here.
-
-PLEASE DELETE THIS TEXT AND ALL THE TEXT ABOVE BEFORE WRITING YOUR SUBJECT
+write your question or suggestion here
