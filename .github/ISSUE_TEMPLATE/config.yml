@@ -3,3 +3,6 @@ contact_links:
   - name: Bliss Community Discord Server
     url: https://discord.gg/8nVt56H9zH
     about: Come chat with me and anyone else
+  - name: Check Already Reported Bugs
+    url: https://github.com/X0nk/Bliss-Shader/issues?q=label%3Abug
+    about: before you report a bug, it would be really good if you checked if it has already been reported!
