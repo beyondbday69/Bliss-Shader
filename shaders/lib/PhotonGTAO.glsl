@@ -96,8 +96,8 @@ vec3 view_to_screen_space(vec3 view_pos, bool handle_jitter) {
 //   ambient occlusion
 // ---------------------
 
-#define GTAO_SLICES        2
-#define GTAO_HORIZON_STEPS 3
+#define GTAO_SLICES        1
+#define GTAO_HORIZON_STEPS 2
 #define GTAO_RADIUS        2.0
 #define GTAO_FALLOFF_START 0.75
 
