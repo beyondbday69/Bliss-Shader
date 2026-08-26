@@ -1,0 +1,113 @@
+name: Package and Release Bliss Shader
+
+on:
+  push:
+    branches:
+      - Stable
+      - Unstable
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - Stable
+      - main
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create a GitHub Release with the packaged shader'
+        required: false
+        type: boolean
+        default: false
+      release_tag:
+        description: 'Release tag name (e.g. v2.1.2-radeon)'
+        required: false
+        type: string
+        default: 'v2.1.2-radeon'
+
+jobs:
+  build:
+    name: Package Shaderpack
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Validate Shader Structure
+        run: |
+          echo "Checking essential shader files..."
+          test -d "shaders" || (echo "Error: shaders directory missing" && exit 1)
+          test -f "shaders/shaders.properties" || (echo "Error: shaders.properties missing" && exit 1)
+          test -f "shaders/lib/settings.glsl" || (echo "Error: settings.glsl missing" && exit 1)
+          echo "Shader structure verified successfully."
+
+      - name: Determine Package Name
+        id: pkg_name
+        run: |
+          VERSION="v2.1.2"
+          BRANCH="${GITHUB_REF_NAME:-Stable}"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.release_tag }}" ]]; then
+            NAME="Bliss-Shader-${{ github.event.inputs.release_tag }}"
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            NAME="Bliss-Shader-${GITHUB_REF_NAME}"
+          else
+            NAME="Bliss-Shader-${BRANCH}"
+          fi
+          echo "ZIP_NAME=${NAME}.zip" >> $GITHUB_OUTPUT
+          echo "PACKAGE_DIR=${NAME}" >> $GITHUB_OUTPUT
+
+      - name: Build Shaderpack Zip
+        run: |
+          ZIP_NAME="${{ steps.pkg_name.outputs.ZIP_NAME }}"
+          echo "Packaging into ${ZIP_NAME}..."
+          
+          # Create zip containing shaders/ and documentation at root of archive
+          zip -r "${ZIP_NAME}" shaders/ LICENSE.md CREDITS.txt README.md
+          
+          # Generate SHA256 Checksum
+          sha256sum "${ZIP_NAME}" > "${ZIP_NAME}.sha256"
+          echo "Package created successfully:"
+          ls -lh "${ZIP_NAME}" "${ZIP_NAME}.sha256"
+          cat "${ZIP_NAME}.sha256"
+
+      - name: Upload Shaderpack Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.pkg_name.outputs.ZIP_NAME }}
+          path: |
+            ${{ steps.pkg_name.outputs.ZIP_NAME }}
+            ${{ steps.pkg_name.outputs.ZIP_NAME }}.sha256
+          retention-days: 90
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && github.event.inputs.create_release == 'true')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.release_tag || github.ref_name }}
+          name: Bliss Shader ${{ github.event.inputs.release_tag || github.ref_name }} (Radeon Performance)
+          body: |
+            ## 🌸 Bliss Shader - ${{ github.event.inputs.release_tag || github.ref_name }}
+            
+            ### ⚡ What's New:
+            * Added **Radeon Performance (680M)** profile preset:
+              * **75% Temporal Super Resolution (TAAU + AMD CAS)**
+              * **1024 Shadow Map Resolution** + **96 Block Distance** (6 filter samples)
+              * **8 Min / 10 Max Cloud Raymarch Steps** (0.3 quality)
+              * **4 Volumetric Fog Samples** at half-resolution
+              * **12 SSR Reflection Steps**
+              * **Distant Horizons overdraw prevention**
+            
+            ### 📦 Installation:
+            1. Download the `.zip` file below.
+            2. Place it into your `.minecraft/shaderpacks/` folder.
+            3. Select **Bliss** in your Shader Packs menu and select the **Radeon Performance (680M)** profile in Shader Options!
+          files: |
+            ${{ steps.pkg_name.outputs.ZIP_NAME }}
+            ${{ steps.pkg_name.outputs.ZIP_NAME }}.sha256
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

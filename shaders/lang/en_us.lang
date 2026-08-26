@@ -1,4 +1,6 @@
 profile.SHADER_VERSION_LABEL = Bliss V2.1.2
+profile.RADEON_PERFORMANCE = Radeon Performance (680M)
+    profile.RADEON_PERFORMANCE.comment = §a[Radeon Performance]§r High-performance preset tailored for AMD Radeon 680M / 780M and handheld gaming APUs. Automatically configures 75% Super Resolution (TAAU + CAS), 1024 shadow map, 8-step volumetric clouds, and 4-sample fog for stable 60+ FPS at high render distance.
 profile.OLD_BLISS_TONEMAP = Bliss V2.1.2 + v2.0.4 Color Processing
 
 # if you're here to translate, this is a joke, these don't do what they say

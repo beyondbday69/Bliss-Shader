@@ -1,4 +1,6 @@
 profile.SHADER_VERSION_LABEL = Bliss V2.1.1
+profile.RADEON_PERFORMANCE = Radeon 性能模式 (680M)
+    profile.RADEON_PERFORMANCE.comment = §a[Radeon 性能模式]§r 专为 AMD Radeon 680M / 780M 核显与掌机优化的预设。启用 75% 超分辨率 (TAAU + CAS)、1024 阴影分辨率、8 步体积云与 4 步体积雾，实现 60+ FPS 稳定流畅运行。
 profile.OLD_BLISS_TONEMAP = Bliss V2.1.1 + v2.0.4 色彩处理
 
 # if you're here to translate, this is a joke, these don't do what they say

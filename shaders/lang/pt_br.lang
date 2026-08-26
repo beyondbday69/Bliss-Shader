@@ -1,4 +1,6 @@
 option.SHADER_VERSION_LABEL = Bliss In-Dev Commit Number
+profile.RADEON_PERFORMANCE = Desempenho Radeon (680M)
+    profile.RADEON_PERFORMANCE.comment = §a[Desempenho Radeon]§r Perfil otimizado para AMD Radeon 680M / 780M e consoles portáteis. Ativa Super Resolução de 75% (TAAU + CAS), mapa de sombra 1024, nuvens volumétricas de 8 passos e névoa otimizada para 60+ FPS.
 
 screen.Misc_Settings = Configurações Diversas
      screen.the_orb = O Orb
